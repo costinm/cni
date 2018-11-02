@@ -74,17 +74,23 @@ jobs:
     steps:
       - <<: *initWorkingDir
       - checkout
+      - attach_workspace:
+          at:  /go
       - run: GOOS=linux make build
       - run: make docker.all
       - run: make test
       - run:
           command: |
             if [ ! -z "${DOCKER_USER}" ] ; then
-              echo "Pushing docker images"
-
               docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
               make docker.push
             fi
+      - store_artifacts:
+          path: /home/circleci/logs
+      - store_artifacts:
+          path: /tmp
+      - store_test_results:
+          path: /go/out/tests
 
 workflows:
   version: 2
