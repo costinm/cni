@@ -78,7 +78,6 @@ jobs:
           at:  /go
       - run: GOOS=linux make build
       - run: make docker.all
-      - run: make test
       - run:
           command: |
             if [ ! -z "${DOCKER_USER}" ] ; then
@@ -113,7 +112,11 @@ workflows:
             - master
     jobs:
     - build
+    - install-cni:
+        requires:
+          - build
     - nightly:
         context: org-global
         requires:
           - build
+          - install-cni
